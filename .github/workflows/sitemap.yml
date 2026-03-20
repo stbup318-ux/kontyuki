@@ -1,0 +1,36 @@
+name: Generate Sitemap
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v3
+
+      - name: sitemap生成
+        run: |
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+          echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+
+          echo '<url><loc>https://stbup318-ux.github.io/kontyuki/</loc></url>' >> sitemap.xml
+
+          find . -name "index.html" | while read file; do
+            url=$(echo $file | sed 's|^\./||' | sed 's|index.html$||')
+            echo "<url><loc>https://stbup318-ux.github.io/kontyuki/$url</loc></url>" >> sitemap.xml
+          done
+
+          echo '</urlset>' >> sitemap.xml
+
+      - name: コミット＆プッシュ
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add sitemap.xml
+          git commit -m "auto generate sitemap" || echo "No changes"
+          git push
