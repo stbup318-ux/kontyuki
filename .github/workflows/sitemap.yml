@@ -13,27 +13,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: チェックアウト
+      - name: Checkout
         uses: actions/checkout@v4
 
-   - name: sitemap生成
-  run: |
-    echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
-    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+      - name: Generate sitemap
+        run: |
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+          echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
 
-    echo '<url><loc>https://stbup318-ux.github.io/kontyuki/</loc></url>' >> sitemap.xml
+          echo '<url><loc>https://stbup318-ux.github.io/kontyuki/</loc></url>' >> sitemap.xml
 
-    find . -name "index.html" | while read file; do
-      url=$(echo "$file" | sed 's|^\./||' | sed 's|index.html$||')
+          find . -name "index.html" | while read file; do
+            url=$(echo "$file" | sed 's|^\./||' | sed 's|index.html$||')
 
-      encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$url")
+            encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$url")
 
-      echo "<url><loc>https://stbup318-ux.github.io/kontyuki/$encoded</loc></url>" >> sitemap.xml
-    done
+            echo "<url><loc>https://stbup318-ux.github.io/kontyuki/$encoded</loc></url>" >> sitemap.xml
+          done
 
-    echo '</urlset>' >> sitemap.xml
+          echo '</urlset>' >> sitemap.xml
 
-      - name: コミット＆プッシュ
+      - name: Commit sitemap
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
