@@ -23,13 +23,22 @@ jobs:
           echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
           echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
 
-          # トップページ
           echo '<url><loc>https://stbup318-ux.github.io/kontyuki/</loc></url>' >> sitemap.xml
 
-          # 各ページ
           find . -name "index.html" | while read file; do
-            url=$(echo "$file" | sed 's|^\./||' | sed 's|index.html$||')
-            echo "<url><loc>https://stbup318-ux.github.io/kontyuki/$url</loc></url>" >> sitemap.xml
+            path=$(echo "$file" | sed 's|^\./||' | sed 's|index.html$||')
+
+            # ディレクトリごとに分割してエンコード
+            encoded=""
+            IFS='/' read -ra parts <<< "$path"
+            for part in "${parts[@]}"; do
+              if [ -n "$part" ]; then
+                enc=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$part")
+                encoded="$encoded/$enc"
+              fi
+            done
+
+            echo "<url><loc>https://stbup318-ux.github.io/kontyuki$encoded/</loc></url>" >> sitemap.xml
           done
 
           echo '</urlset>' >> sitemap.xml
