@@ -13,18 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate sitemap
+      - name: Generate sitemap.xml
         run: |
+          rm -f sitemap.xml
+
           echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
           echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
 
           # トップページ
           echo '<url><loc>https://stbup318-ux.github.io/kontyuki/</loc></url>' >> sitemap.xml
 
-          # index.html を元にURL生成
+          # 各ページ
           find . -name "index.html" | while read file; do
             url=$(echo "$file" | sed 's|^\./||' | sed 's|index.html$||')
             echo "<url><loc>https://stbup318-ux.github.io/kontyuki/$url</loc></url>" >> sitemap.xml
@@ -32,10 +34,10 @@ jobs:
 
           echo '</urlset>' >> sitemap.xml
 
-      - name: Commit sitemap
+      - name: Commit and push sitemap
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add sitemap.xml
-          git commit -m "auto generate sitemap" || echo "No changes"
+          git commit -m "Update sitemap.xml" || echo "No changes"
           git push
