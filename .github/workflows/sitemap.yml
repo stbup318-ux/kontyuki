@@ -5,13 +5,16 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: チェックアウト
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: sitemap生成
         run: |
